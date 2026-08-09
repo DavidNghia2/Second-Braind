@@ -1,0 +1,3 @@
+[build]
+# Keep Cargo artifacts separate from the stale, Windows-locked `target` cache.
+target-dir = "../target-fresh"

@@ -1,0 +1,1013 @@
+SECOND BRAIN - KE HOACH SUA CHUA VA HOAN THIEN TOAN BO DU AN
+
+Tai lieu nay la muc tieu trien khai chinh cua du an. Moi thay doi phai duoc thuc hien theo thu tu uu tien, co kiem thu va khong lam hong cac luong dang hoat dong.
+
+==================================================
+I. MUC TIEU SAN PHAM
+==================================================
+
+1. Second Brain phai la ung dung ghi chu desktop de hieu, an toan du lieu va thoai mai khi su dung lau.
+2. Editor la trung tam cua giao dien; sidebar, tab, toolbar va attachment chi ho tro, khong duoc lan at vung viet.
+3. Muc Tep hoat dong nhu lich su ghi chu ket hop cay thu muc:
+   - Ghi chu moi mac dinh nam trong Khong co thu muc.
+   - Khong tu dong dua ghi chu moi vao bat ky folder nao.
+   - Ghi chu chi nam trong folder khi nguoi dung chu dong tao/chon/di chuyen vao folder.
+   - Ghi chu trong folder van co the xuat hien o Gan day va Tat ca ghi chu.
+   - Folder hien noi dung truc tiep va cac folder con theo dung cau truc.
+4. Cac view ao phai tach khoi cay folder:
+   - Tat ca ghi chu.
+   - Yeu thich.
+   - Danh dau/Ghim.
+   - Thung rac.
+   - Tim kiem.
+   - Folder cu the.
+   - Khong co thu muc.
+5. Yeu thich va Thung rac nam tren ribbon ben trai, khong nam trong danh sach folder.
+6. Thung rac la giao dien doc lap, dung du lieu SQLite that, ho tro note va folder soft delete.
+7. Attachment co the duoc them, mo, keo vao editor va go khoi note mot cach ro rang, khong tao ban ghi trung va khong xoa file ngoai y muon.
+8. Moi luong co nguy co mat du lieu phai duoc uu tien sua truoc UI polish va tinh nang moi.
+
+==================================================
+II. NGUYEN TAC BAT BUOC KHI SUA
+==================================================
+
+1. Truoc moi dot sua:
+   - Doc PROJECT_CONTEXT.md.
+   - Chay git status --short.
+   - Doc git diff cua tung file sap sua.
+   - Khong reset, checkout, clean hoac ghi de thay doi chua commit.
+2. Khong thay the:
+   - Tiptap editor va schema hien tai.
+   - documentForNote, onUpdate va cac NodeView hien tai.
+   - Autosave revision map va serialized queue.
+   - SQLite repository/database architecture.
+   - Attachment ID, note_attachments relation va custom drag MIME.
+   - Rust storage path validation/canonicalization.
+3. Khong sua migration da phat hanh. Neu can doi schema, tao migration moi co version tiep theo.
+4. Khong tao note store thu hai, Trash store thu hai hoac attachment system song song.
+5. Khong import lai file khi keo attachment da ton tai vao editor.
+6. Khong dat duong dan vat ly vao DataTransfer.
+7. Moi thao tac xoa vinh vien phai co confirm va phai xu ly dung attachment lien quan.
+8. Moi thay doi P0 phai co automated test hoac integration test truoc khi refactor UI lon.
+9. Dung token mau semantic. Mau accent chi danh cho active state, focus va primary action.
+10. Tat ca text hien cho nguoi dung phai ho tro dung ngon ngu VI/EN; khong hard-code du lieu mau.
+
+==================================================
+III. THU TU UU TIEN
+==================================================
+
+P0 - An toan du lieu va tinh dung dan:
+1. Refresh khong duoc lam mat noi dung chua autosave.
+2. Save that bai khong duoc bi bo qua khi chuyen/tao note.
+3. Permanent delete note/folder co attachment phai thanh cong dung FK.
+4. Go attachment khoi note khong duoc xoa file vat ly trai voi thong bao.
+5. Import/paste/drop attachment khong duoc chen vao nham note.
+
+P1 - Luong su dung chinh:
+1. Tim kiem toan cuc hoat dong.
+2. Muc Tep va cay folder ro rang, dung du lieu, khong bo sot Unfiled.
+3. Folder selector khong chua folder da xoa va hien dung path.
+4. Thung rac day du, responsive va co batch action an toan.
+5. Settings mo ngay khi click.
+
+P2 - UI/UX, accessibility va kien truc:
+1. Tang do doc, contrast va kich thuoc hit target.
+2. Sua keyboard/focus/modal/tab/resizer.
+3. Tach App.tsx, hop nhat Files sidebar va xoa UI legacy sau khi co test.
+
+P3 - Tinh nang bo sung va ve sinh repository:
+1. Export, duplicate, tags, command palette, local history.
+2. Integrity checker va attachment cleanup queue.
+3. Tach CSS, visual regression va don build artifacts bang commit rieng.
+
+==================================================
+IV. GIAI DOAN 0 - CHOT BASELINE VA BO SUNG TEST HARNESS
+==================================================
+
+Muc tieu:
+- Co kha nang phat hien hoi quy truoc khi sua cac luong du lieu.
+- Tach ro source change cua dot sua khoi build artifact dang ton tai.
+
+Cong viec:
+1. Ghi lai git status va danh sach file dirty hien tai.
+2. Khong don cac thu muc target/dist trong cung commit voi sua tinh nang.
+3. Bo sung test runner frontend, uu tien Vitest + React Testing Library neu phu hop Vite hien tai.
+4. Bo sung integration test SQLite/Rust cho note, folder va attachment lifecycle.
+5. Tao fixture nho gom:
+   - Note thuong khong folder.
+   - Note trong folder cha/con.
+   - Note yeu thich va note ghim.
+   - Note da soft delete.
+   - Folder tree da soft delete.
+   - Managed attachment, linked attachment va attachment duoc tham chieu boi nhieu note.
+6. Ghi manual smoke-test checklist cho Tauri WebView2.
+
+File can xem/sua:
+- package.json: them script test, test:watch va test:integration khi phu hop.
+- vite.config.ts: cau hinh test environment neu can.
+- src/features/notes/*.test.ts: test store/repository logic.
+- src/features/trash/*.test.ts: test model va bulk selection.
+- src-tauri/src/note_operations.rs: module test/integration test cho transaction.
+- .gitignore: chi bo sung ignore pattern trong commit ve sinh rieng, khong xoa file dang tracked o giai doan nay.
+
+Dieu kien hoan thanh:
+- TypeScript, Cargo va test runner deu chay duoc.
+- Chua thay doi hanh vi nguoi dung.
+
+==================================================
+V. GIAI DOAN 1 - SUA P0 AN TOAN DU LIEU
+==================================================
+
+A. Safe Refresh
+
+Van de:
+- useNotesStore.refresh() thay notesRef bang du lieu SQLite ma khong flush hoac bao toan note dirty.
+- Nut Refresh trong Files/Favorites goi thang store.refresh().
+
+Huong sua:
+1. Tao mot entry point refresh an toan:
+   - Huy timer autosave lien quan hoac giu timer dung cach.
+   - Goi flushAll().
+   - Neu flush that bai: dung refresh, giu state hien tai va hien loi.
+   - Chi reload SQLite sau khi flush thanh cong.
+2. Neu can mot refresh noi bo khong flush sau transaction, dat ten ro nhu reloadFromDatabaseUnsafe/internalReload va khong expose cho UI.
+3. UI Refresh phai disabled khi dang xu ly va co feedback ngan.
+4. Test tinh huong go noi dung roi nhan Refresh truoc 700ms.
+
+File:
+- src/features/notes/useNotesStore.ts
+- src/App.tsx
+- src/features/sidebar/FilesSidebarLayout.tsx
+- src/features/sidebar/FlatNotesSidebar.tsx
+
+B. Khong bo qua flush failure
+
+Van de:
+- selectNote() va create() await flush() nhung khong kiem tra boolean result, sau do van chuyen note/tao note va dat saved.
+
+Huong sua:
+1. selectNote() phai tra false hoac throw neu flush note truoc that bai.
+2. create() khong duoc tao row moi neu flush note hien tai that bai.
+3. Khong dat saveState=saved neu dirty van con hoac flush that bai.
+4. Moi caller phai xu ly failure thong nhat qua mot controller/action helper.
+5. Test Ctrl+N, click note, click tab, dong tab va chuyen Ribbon trong luc save that bai.
+
+File:
+- src/features/notes/useNotesStore.ts
+- src/App.tsx
+- src/features/workspace/workspaceStore.ts neu can dong bo tab sau khi selection that bai.
+
+C. Sua permanent delete va foreign key attachment
+
+Van de:
+- attachments.note_id la NOT NULL va tham chieu notes.id.
+- Rust dang DELETE note truoc khi xoa/reassign attachment provenance.
+
+Huong sua:
+1. Tao migration moi, khong sua migration 003/008:
+   - Uu tien doi note_id thanh origin_note_id nullable hoac note_id nullable voi ON DELETE SET NULL.
+   - Bao toan du lieu cu va index can thiet.
+2. Trong permanent delete transaction:
+   - Lay danh sach attachment lien quan.
+   - Xoa note_attachments relation cua note bi xoa.
+   - Neu attachment con relation khac: reassign provenance den mot note con ton tai neu schema van can.
+   - Neu attachment khong con relation: xoa attachment row truoc khi DELETE note.
+   - DELETE note sau cung trong transaction.
+3. Folder permanent delete lam tuong tu cho toan cay, khong xoa active note ngoai scope.
+4. Sau commit DB, xoa file managed vat ly. Neu xoa file that bai:
+   - Log ro attachment ID/path mode.
+   - Dua vao cleanup retry queue hoac hien canh bao, khong nuot loi im lang.
+5. Test:
+   - Note khong attachment.
+   - Note co managed attachment.
+   - Note co linked attachment.
+   - Attachment dung chung nhieu note.
+   - Folder tree co nhieu attachment.
+
+File:
+- src-tauri/migrations/010_*.sql (ten cu the theo noi dung migration moi).
+- src-tauri/src/lib.rs: dang ky migration moi.
+- src-tauri/src/note_operations.rs
+- src/features/notes/useNotesStore.ts
+- src/features/notes/noteService.ts
+- src/features/notes/noteRepository.ts neu can cap nhat schema mapping.
+- src/features/notes/types.ts neu doi field provenance.
+
+D. Chot chinh sach Go attachment
+
+Muc tieu:
+- Go khoi ghi chu chi bo relation va node trong document, khong xoa file vat ly.
+
+Huong sua:
+1. Sua storageService.unlink() de khong goi removePhysical cho thao tac thong thuong.
+2. Neu attachment khong con relation:
+   - Co the giu attachment row/file de phuc hoi, hoac dua vao orphan registry.
+   - Khong xoa im lang.
+3. Them thao tac rieng neu san pham can Xoa file vinh vien; phai confirm ro managed/linked behavior.
+4. Sua noi dung confirm cho dung hanh vi thuc te.
+5. Bao toan quy tac file linked khong bao gio bi Second Brain xoa file goc.
+
+File:
+- src/features/notes/AttachmentsPanel.tsx
+- src/features/notes/storageService.ts
+- src/features/notes/noteRepository.ts
+- src/App.tsx (detachAttachment/removeAttachment).
+- PROJECT_CONTEXT.md sau khi hanh vi duoc chot va test.
+
+Dieu kien hoan thanh Giai doan 1:
+- Khong mat noi dung khi Refresh hoac save that bai.
+- Permanent delete co attachment thanh cong va khong vi pham FK.
+- Go attachment khong xoa file vat ly ngoai y muon.
+- Cac test P0 deu pass.
+
+==================================================
+VI. GIAI DOAN 2 - ON DINH ATTACHMENT, PASTE VA DRAG/DROP
+==================================================
+
+A. Khoa async result theo note/editor
+
+1. Moi request load attachment/link preview phai capture noteId.
+2. Truoc setAttachments/setLinkPreviews, kiem tra selectedId van trung noteId.
+3. Dung request generation/abort flag de bo response cu khi chuyen note.
+4. Khong tu dong dong Inspector do response stale cua note cu.
+
+File:
+- src/App.tsx
+- src/features/notes/AttachmentsPanel.tsx
+
+B. Paste/import khong chen vao nham note
+
+1. Khi bat dau paste/import/drop, capture:
+   - noteId.
+   - editor instance/generation.
+   - vi tri selection neu can.
+2. Khi promise hoan tat:
+   - Kiem tra note hien tai van dung noteId.
+   - Kiem tra editor van la editor generation da capture.
+   - Neu da doi note: khong chen node vao document moi; thong bao file da duoc them vao note cu neu DB import da xay ra.
+3. Khong reuse vi tri cu tren document cua note khac.
+
+File:
+- src/features/editor/RichTextEditor.tsx
+- src/App.tsx
+- src/features/notes/storageService.ts
+
+C. Native OS drop va multi-file
+
+1. Tach native drop listener thanh hook/controller co callback/ref on dinh.
+2. Khong de listener giu richEditor stale.
+3. Xu ly tat ca paths thay vi chi paths[0].
+4. Hien progress theo tung file va summary thanh cong/that bai.
+5. HTML drop:
+   - Image bytes co the import nhu hien tai.
+   - File khac khong co Tauri path phai bao ro khong ho tro, khong im lang bo qua.
+
+File:
+- src/App.tsx hoac hook moi src/features/attachments/useNativeAttachmentDrop.ts.
+- src/features/notes/storageService.ts
+
+D. Attachment Inspector performance va UX
+
+1. Khong query SQLite/filesystem moi khi content_json thay doi tung keystroke.
+2. Tach:
+   - Refresh danh sach relation khi noteId/thao tac attachment thay doi.
+   - Parse attachment IDs trong document voi debounce/memo neu thuc su can.
+   - Availability check co cache va refresh theo yeu cau.
+3. Them loading state, tranh nhay empty state khi request chua xong.
+4. Khong trung id add-attachment trong header va empty state.
+5. Bo tieu de Attachments bi lap giua NoteInspector va AttachmentsPanel.
+6. Hien hint tren card: Keo vao editor de chen.
+7. Dung icon file chung cho DOC/ZIP/TXT; khong dung icon image cho moi file khong phai PDF.
+
+File:
+- src/features/notes/AttachmentsPanel.tsx
+- src/features/inspector/NoteInspector.tsx
+- src/App.css
+
+E. Bao toan attachment drag hien tai
+
+Phai tiep tuc dat cac tieu chi:
+1. Card attachment draggable.
+2. DataTransfer dung application/x-secondbrain-attachment.
+3. Payload chi gom attachmentId, mimeType, originalName; khong co physical path.
+4. Drop vao vi tri hop le bang posAtCoords/dropPoint.
+5. Image dung managedImage; file khac dung attachmentBlock.
+6. Khong import file lan hai, khong tao SQLite row trung.
+7. Single-click image chi select; double-click moi mo popup.
+8. Escape/outside click/switch note dong popup dung.
+9. Autosave van nhan Tiptap transaction sau insert.
+
+File can giu on dinh, chi sua khi test bat buoc:
+- src/features/editor/attachmentDrag.ts
+- src/features/editor/RichTextEditor.tsx
+- src/features/editor/RichNodeViews.tsx
+- src/features/notes/AttachmentsPanel.tsx
+
+==================================================
+VII. GIAI DOAN 3 - DIEU HUONG, SEARCH, SETTINGS VA TAB
+==================================================
+
+A. Hop nhat navigation state
+
+1. Dinh nghia mot model duy nhat:
+   type SidebarView =
+     | { type: "all" }
+     | { type: "favorites" }
+     | { type: "bookmarks" }
+     | { type: "trash" }
+     | { type: "search" }
+     | { type: "folder"; folderId: string }
+     | { type: "unfiled" };
+2. Khong import navigation type tu component FileExplorer legacy.
+3. Tach hai action:
+   - activateSidebarView(view): idempotent, chi chon view va dam bao sidebar mo.
+   - toggleSidebar(): chi an/hien sidebar.
+4. Click lai Trash khong reset selection/khong toggle bat ngo.
+5. Ctrl+O va Open note khong duoc vo tinh dong Files sidebar.
+6. Hydration khong mo tab cua note da deleted trong editor thuong.
+
+File:
+- src/features/workspace/workspaceStore.ts
+- src/App.tsx
+- src/features/sidebar/Ribbon.tsx
+- src/features/sidebar/FileExplorer.tsx/type moi tach ra model file neu can.
+
+B. Search toan cuc that
+
+1. Ctrl+K mo Search view/modal va focus input that.
+2. Search tren active notes, loai note deleted tru khi dang o Trash.
+3. Tim theo title, plain content va folder name/path.
+4. Ket qua hien:
+   - Title.
+   - Snippet ngan.
+   - Folder path hoac Khong co thu muc.
+   - Updated time.
+5. Click mot lan mo preview tab; double-click pin tab.
+6. Co loading, no-result va clear-query state.
+7. Khong de shortcut tro toi selector da unmount.
+
+File:
+- Component moi src/features/search/SearchSidebar.tsx hoac SearchView.tsx.
+- src/App.tsx
+- src/features/sidebar/SidebarViewPanel.tsx: bo placeholder Search.
+- src/features/sidebar/Ribbon.tsx
+
+C. Danh dau/Ghim
+
+1. Chot semantics: Danh dau su dung note.is_pinned.
+2. View Danh dau chi hien active notes co is_pinned=1.
+3. Khong mo ta nham la Yeu thich.
+4. Sort pinned view theo updated_at hoac thu tu nguoi dung chot.
+5. Neu chua lam kip demo, an icon thay vi hien placeholder khong hoat dong.
+
+File:
+- src/features/sidebar/Ribbon.tsx
+- src/features/sidebar/SidebarViewPanel.tsx
+- src/features/sidebar/FlatNotesSidebar.tsx hoac component note list chung.
+- src/App.tsx
+
+D. Settings phai mo ngay
+
+1. setSettingsOpen(true) ngay khi click.
+2. Tai storage status/import mode/editor settings/backups ben trong modal.
+3. Co loading/error state rieng cho tung section.
+4. Loi list backup khong duoc chan toan bo Settings mo.
+5. Settings icon dat tach o cuoi ribbon bang spacer.
+
+File:
+- src/App.tsx
+- Component moi src/features/settings/SettingsDialog.tsx.
+- src/features/sidebar/Ribbon.tsx
+- src/App.css
+
+E. Tab accessibility
+
+1. Khong long span role=button ben trong button tab.
+2. Tach tab container va nut close that.
+3. Ho tro ArrowLeft/ArrowRight, Home/End, Delete/Ctrl+W.
+4. Roving tabIndex va focus visible.
+5. Tab drag dung custom MIME, khong dung text/plain de tranh xung dot voi drag khac.
+6. Hien save failed/dirty indicator tren tab lien quan neu co.
+
+File:
+- src/features/workspace/WorkspaceTabs.tsx
+- src/features/workspace/workspaceStore.ts
+- src/App.css
+
+==================================================
+VIII. GIAI DOAN 4 - THIET KE LAI MUC TEP VA FOLDER
+==================================================
+
+A. Bo cuc sidebar Tep chinh thuc
+
+Thu tu de xuat:
+1. Header:
+   - Tieu de Tep.
+   - Nut Ghi chu moi.
+   - Nut Thu muc moi.
+   - Sort/overflow.
+   - Refresh an toan.
+2. Search trong Tep.
+3. Gan day:
+   - Toi da 6-8 active notes.
+   - Sort updated_at giam dan.
+   - Collapse duoc.
+   - Xem tat ca chuyen sang All Notes.
+4. Khong co thu muc:
+   - Active notes co folder_id=null.
+   - Nam tren cay folder de de phan loai note moi.
+   - La drop target ro rang.
+5. Thu muc moi tao/Gan day:
+   - Chi 2-3 shortcut.
+   - Mac dinh thu gon.
+   - Khong thay the cay folder chinh.
+6. Thu muc cua ban:
+   - Cay folder that tu SQLite.
+   - Folder A-Z on dinh.
+   - Subfolder truoc, direct notes sau.
+   - Count gom active notes trong toan subtree.
+
+B. Quy tac note/folder
+
+1. Note moi tu header Tep: folderId=null.
+2. Note moi tu Unfiled: folderId=null.
+3. Note moi tu folder action: folderId=dung folder do.
+4. Tao note trong folder khong reset view ve All.
+5. Folder click:
+   - Click chevron chi expand/collapse.
+   - Click label chon folder va mo overview/danh sach lien quan.
+6. Folder action tren hover va keyboard focus:
+   - New note.
+   - New subfolder.
+   - Rename.
+   - Move neu trien khai.
+   - Move to Trash.
+7. Tao folder rong:
+   - Khong ghi vao database neu nguoi dung chua nhap ten hoac cancel dialog.
+   - Validate trim, ten rong va duplicate trong cung parent.
+8. Tao subfolder phai hien breadcrumb parent trong dialog va auto-expand parent sau khi thanh cong.
+
+C. Search trong Tep
+
+1. Search ca title/content note va ten/path folder.
+2. Khi co query, dung danh sach ket qua ro rang thay vi chi an quick section.
+3. Bat buoc hien note Unfiled khop query.
+4. Ket qua note trong folder hien breadcrumb path.
+5. Auto-expand ancestor cua folder match neu van dung tree result.
+6. Co no-result state khac voi folder empty.
+
+D. Sort
+
+1. Gan day luon updated_at giam dan.
+2. Cay folder luon A-Z tu nhien, khong nhay theo updated time.
+3. Notes trong folder co lua chon:
+   - Moi cap nhat.
+   - Tao gan day.
+   - A-Z.
+4. Persist sort va expanded folders trong workspace store.
+
+E. Move note
+
+1. Drag note vao folder/Unfiled goi store.moveNoteToFolder().
+2. Drop target co outline/label ro.
+3. Thanh cong hien toast; that bai giu note o vi tri cu va hien retry/error.
+4. Co cach thay the cho keyboard/touch: Move dialog voi cay folder.
+5. Folder selector trong editor:
+   - Chi active folders.
+   - Hien full path.
+   - Goi action move an toan, khong chi updateSelected truc tiep.
+
+F. Delete folder tu Tep
+
+1. Menu phai nam trong data-overlay-root de global outside-click khong dong truoc onClick.
+2. Confirm hien:
+   - Ten folder.
+   - So subfolder.
+   - So active note bi chuyen vao Trash.
+3. Flush tat ca note lien quan truoc soft delete.
+4. Goi duy nhat store.removeFolderTree -> Rust trash_folder_tree.
+5. Sau thanh cong:
+   - Branch bien mat ngay khoi Files.
+   - Dong tab note trong branch neu can.
+   - Chon fallback an toan.
+   - Hien Undo neu co the.
+6. Khong hard delete trong luong nay.
+
+File chinh:
+- src/features/sidebar/FilesSidebarLayout.tsx: component dang mount, la noi sua truoc mat.
+- src/App.tsx: actions/controller, khong them JSX lon vao day.
+- src/features/notes/useNotesStore.ts
+- src/features/notes/noteService.ts
+- src/features/workspace/workspaceStore.ts
+- src/App.css hoac CSS feature moi.
+
+Refactor sau khi behavior pass:
+- Tach RecentNotesSection.tsx.
+- Tach UnfiledSection.tsx.
+- Tach FolderTree.tsx.
+- Tach FolderRow.tsx.
+- Tach NoteRow.tsx.
+- Tach MoveNoteDialog.tsx.
+- Sau smoke test, loai FilesSidebar.tsx/FileExplorer.tsx legacy khong con caller.
+
+==================================================
+IX. GIAI DOAN 5 - HOAN THIEN THUNG RAC
+==================================================
+
+A. Du lieu hien thi
+
+1. Chi hien notes/folders co deleted_at khac null.
+2. Note/folder deleted khong duoc hien trong Files, Favorites, Bookmarks, folder active hoac Unfiled.
+3. Folder deleted hien theo cay, co expand/collapse va direct notes.
+4. Search theo title/content note va ten folder.
+5. Sort:
+   - Moi xoa gan day.
+   - Cu hon truoc.
+   - Ten A-Z.
+
+B. Sidebar Trash
+
+1. Tieu de, tong so muc xoa.
+2. Khoi phuc tat ca.
+3. Don sach Thung rac.
+4. Search va sort.
+5. Checkbox chon nhieu.
+6. Empty state:
+   - Trash is empty.
+   - No search results.
+7. Click note/folder mot lan mo preview ngay.
+8. Click lai icon Trash khong toggle/reset view.
+
+C. Preview note
+
+1. Read-only, khong mount toolbar, khong autosave.
+2. Hien:
+   - Title.
+   - Trash status.
+   - Noi dung rich text read-only dung nghia hoac renderer an toan tu content_json.
+   - Attachment inventory va missing status.
+   - Folder cu/path.
+   - Deleted time.
+   - Favorite/pinned va metadata that dang co.
+   - Word count.
+3. Khong hien Tag mau; chi hien khi schema tag that ton tai.
+4. Restore la primary accent.
+5. Delete Permanently la destructive outline, khong noi hon Restore.
+
+D. Preview folder
+
+1. Ten folder, deleted time, path cu.
+2. So subfolder va note se duoc restore/xoa thuc te.
+3. UI phai phan biet note bi xoa cung folder timestamp va note da bi xoa doc lap truoc do.
+4. Danh sach preview khong duoc hua restore nhung muc backend khong restore.
+
+E. Restore
+
+1. Note:
+   - Clear deleted_at tren chinh row cu.
+   - Restore attachment relations.
+   - Ve folder cu neu folder con active.
+   - Neu folder mat/deleted: folder_id=null.
+2. Folder:
+   - Restore dung tree va cac note bi xoa cung lan.
+   - Khong restore nham note da xoa doc lap.
+   - Khong tao row ban sao.
+3. Sau restore/xoa:
+   - Loai muc khoi list ngay.
+   - Chon muc ke tiep theo sort hien tai; neu het hien overview.
+
+F. Permanent delete va bulk
+
+1. Luon confirm.
+2. Folder confirm hien dung so note se bi anh huong.
+3. Bulk action bar:
+   - So muc chon.
+   - Khoi phuc da chon.
+   - Xoa vinh vien da chon.
+   - Bo chon.
+4. Uu tien them Rust batch commands transaction thay vi loop frontend refresh tung item.
+5. Neu chua co batch backend, collect ket qua va hien summary thanh cong/that bai, khong im lang partial success.
+6. Restore confirm dung primary/neutral style, khong dung danger modal/icon Trash.
+7. Cleanup physical attachments tuan theo policy Giai doan 1.
+
+G. Responsive
+
+1. Trash main co overflow-y:auto.
+2. Desktop rong: preview + detail card.
+3. Cua so hep: detail card xuong duoi preview.
+4. Bulk bar sticky, khong che content.
+5. Nut action khong bi cat o min window 980x640.
+
+File:
+- src/features/trash/TrashView.tsx
+- src/features/trash/TrashList.tsx
+- src/features/trash/TrashFolderItem.tsx
+- src/features/trash/TrashNotePreview.tsx
+- src/features/trash/TrashFolderPreview.tsx
+- src/features/trash/TrashActionBar.tsx
+- src/features/trash/trashModel.ts
+- src/App.tsx: tach controller ra hook/component, khong nhan them JSX lon.
+- src/features/notes/useNotesStore.ts
+- src/features/notes/noteService.ts
+- src-tauri/src/note_operations.rs
+- src/App.css/CSS feature moi.
+
+==================================================
+X. GIAI DOAN 6 - EDITOR, TOOLBAR, UI VA ACCESSIBILITY
+==================================================
+
+A. Editor layout
+
+1. Giu max-width 780px va can giua.
+2. Giam tong chrome truoc vung viet:
+   - Tabs 40-42px.
+   - Editor header gon.
+   - Edit/Preview va save state cung mot hang neu phu hop.
+   - Toolbar compact 40-44px.
+3. Editor canvas co padding thoai mai o 980x640 va man hinh lon.
+4. Toolbar sticky neu can, khong che selection/menu.
+
+B. Toolbar
+
+1. Nhom nang cao trong More:
+   - Font family/size.
+   - Strike, checklist, quote, inline code, code block.
+   - Image, file, YouTube.
+2. Nhom chinh chi giu paragraph, bold, italic, underline, list, link, undo/redo.
+3. Label VI/EN day du; khong de Bold/Italic/Underline co dinh tieng Anh trong VI.
+4. Neu con RichTextToolbar cu khong caller, xoa sau test thay vi giu hai implementation.
+
+C. Preview mode
+
+1. Chot ten/semantics:
+   - Neu la Xem truoc noi dung: title/folder/pin/favorite co the van edit nhung can UI noi ro.
+   - Neu la Read-only preview: khoa toan bo metadata va actions edit.
+2. Khong de nguoi dung hieu sai trang thai.
+
+D. Save status
+
+1. Hien Dang luu khi saving.
+2. Hien Da luu ngan gon sau success.
+3. Save failed phai persistent, co Retry va khong bi view switch che mat.
+4. Tab co indicator neu note do failed/dirty.
+
+E. Typography va mau
+
+1. Baseline de xuat:
+   - Navigation/note title: 12-13px.
+   - Metadata: toi thieu 11px.
+   - Menu/button text: 11-12px.
+   - Body editor: 16px tro len tuy settings.
+2. Khong tiep tuc dung 8-10px tran lan.
+3. Light theme text phu dat WCAG AA phu hop kich thuoc.
+4. Accent chi cho:
+   - Active row/view.
+   - Focus ring.
+   - Primary CTA.
+   - Drop target quan trong.
+5. Empty-state icon/background dung neutral, khong tat ca deu tim.
+6. Font khai bao phai co fallback thuc te; khong hua Inter/Lora neu app khong bundle font.
+
+F. Accessibility
+
+1. Hit target icon toi thieu 32-36px desktop.
+2. Tat ca icon-only button co aria-label va tooltip thong nhat.
+3. Hover action phai ton tai trong DOM va truy cap bang keyboard; dung opacity/visibility thay display:none.
+4. Modal:
+   - Escape.
+   - Focus trap.
+   - Initial focus.
+   - Restore focus.
+   - ID title rieng cho moi dialog.
+5. Resizer:
+   - tabIndex=0.
+   - aria-valuemin/max/now.
+   - Arrow key resize.
+   - pointercancel/lost capture cleanup.
+6. Inspector bottom drawer resize theo clientY/height, desktop resize theo clientX/width.
+7. prefers-reduced-motion tiep tuc duoc bao toan.
+
+G. Localization va prompt
+
+1. Placeholder Tiptap thay doi theo language, khong hard-code Bat dau viet.
+2. Drop overlay co VI/EN.
+3. Managed/Linked va moi metadata duoc dich.
+4. Thay window.prompt/window.confirm bang dialog noi bo co validation/focus dung cho:
+   - Link URL.
+   - YouTube URL.
+   - Image caption.
+   - Attachment remove.
+
+File:
+- src/App.css
+- src/App.tsx
+- src/features/editor/CompactRichTextToolbar.tsx
+- src/features/editor/RichTextEditor.tsx
+- src/features/editor/RichNodeViews.tsx
+- src/features/workspace/WorkspaceTabs.tsx
+- src/features/workspace/WorkspaceShell.tsx
+- src/features/inspector/NoteInspector.tsx
+- src/features/notes/AttachmentsPanel.tsx
+- Component dialog chung moi trong src/components/dialog/ neu can.
+
+==================================================
+XI. GIAI DOAN 7 - REFACTOR KIEN TRUC SAU KHI CAC LUONG PASS
+==================================================
+
+Muc tieu:
+- Giam rui ro UI hoi quy, khong thay kien truc luu tru/editor.
+
+A. Tach App.tsx
+
+Tach dan, moi buoc co test/build:
+1. EditorPane.tsx:
+   - Editor header.
+   - Edit/Preview.
+   - Toolbar.
+   - Editor canvas va save status.
+2. useNoteNavigationController.ts:
+   - Open/select/close tab.
+   - Flush guard.
+   - Create note.
+3. useAttachmentController.ts:
+   - Load/import/replace/detach/drop.
+   - Request generation.
+4. useTrashController.ts:
+   - Selection, bulk, confirm data.
+5. SettingsDialog.tsx.
+6. ConfirmDialog.tsx/Modal.tsx co accessibility day du.
+
+B. Mot nguon navigation state
+
+1. Bo state trung lap giua App va workspaceStore.
+2. Folder selection va virtual view nam trong model ro rang.
+3. recentNoteIds phai duoc UI dung that hoac loai bo.
+
+C. Hop nhat sidebar
+
+1. Mot NoteRow dung chung cho Files/Favorites/Bookmarks/Search khi co the.
+2. Mot FolderTree dung chung cho Files va move dialog; Trash co model deleted rieng.
+3. Sau khi behavior va smoke test pass:
+   - Xoa FilesSidebar.tsx khong caller.
+   - Xoa/thu gon FileExplorer.tsx legacy.
+   - Bo hidden sidebar/note-column legacy khoi App, khong chi display:none.
+
+D. Repository/service
+
+1. noteService chi expose mot duong Trash transaction chinh thuc.
+2. Xoa API soft-delete JS legacy sau khi chac chan khong caller.
+3. Dat ten ro thao tac transaction va thao tac UI facade.
+4. Khong de hai implementation restore folder co semantics khac nhau.
+
+E. CSS
+
+1. Chia token/base/layout/feature styles.
+2. Uu tien CSS module hoac file theo feature neu khong pha NodeView styles.
+3. Xoa selector legacy sau khi DOM legacy duoc xoa.
+4. Them visual regression cho Files, Trash, Editor, Inspector, Settings o dark/light va min size.
+
+File:
+- src/App.tsx
+- src/App.css
+- src/features/workspace/*
+- src/features/sidebar/*
+- src/features/trash/*
+- src/features/notes/noteService.ts
+- src/features/notes/noteRepository.ts
+
+==================================================
+XII. GIAI DOAN 8 - TINH NANG NEN THEM
+==================================================
+
+Can cho demo sau khi P0/P1 on dinh:
+1. Search toan cuc.
+2. Danh dau/Ghim that.
+3. Undo cho move note, soft delete va restore.
+4. Xem tat ca duoi Gan day.
+5. Folder overview.
+6. Multi-file import feedback.
+
+Lam sau:
+1. Duplicate note.
+2. Export Markdown/PDF.
+3. Tags that va filter tag.
+4. Command palette Ctrl+P that.
+5. Local version history don gian.
+6. Persist sort/collapse/recent folders.
+
+Khi app on dinh:
+1. Database integrity checker.
+2. Orphan attachment inspector/cleanup retry.
+3. Backup dinh ky cuc bo va restore verification.
+4. Visual regression va full Tauri smoke automation.
+
+Khong uu tien luc nay:
+- Login.
+- Cloud sync.
+- Collaboration.
+- He thong project/team lon.
+
+==================================================
+XIII. MA TRAN FILE CAN SUA
+==================================================
+
+src/App.tsx
+- Giam orchestration va state trung lap.
+- Safe action entry points.
+- Attachment request identity.
+- Search/settings/navigation wiring.
+- Loai DOM legacy sau refactor.
+
+src/App.css
+- Typography, contrast, hit targets.
+- Responsive Trash/Inspector.
+- Sticky/compact editor chrome.
+- Loai style legacy theo tung dot.
+
+src/features/notes/useNotesStore.ts
+- Safe refresh.
+- Flush failure semantics.
+- Permanent delete cleanup feedback.
+- Khong thay revision/queue core neu khong can.
+
+src/features/notes/noteService.ts
+- Mot API transaction chinh thuc cho Trash.
+- Batch commands neu duoc them.
+
+src/features/notes/noteRepository.ts
+- Schema mapping migration moi.
+- Attachment relation/unlink policy.
+- Loai path legacy sau test.
+
+src/features/notes/storageService.ts
+- Unlink khong xoa physical file.
+- Cleanup rieng va log/retry.
+- Import consistency.
+
+src/features/notes/AttachmentsPanel.tsx
+- Loading state.
+- Khong refresh moi keystroke.
+- Drag hint, icon file, VI/EN.
+- Confirm chinh xac.
+
+src/features/editor/RichTextEditor.tsx
+- Async paste guard.
+- Language placeholder.
+- Bao toan drag/drop va NodeView behavior.
+
+src/features/editor/CompactRichTextToolbar.tsx
+- Label VI/EN, More menu, focus/size polish.
+
+src/features/workspace/workspaceStore.ts
+- Mot navigation model.
+- Tach activate view khoi toggle sidebar.
+- Persist expanded/sort neu can.
+
+src/features/workspace/WorkspaceTabs.tsx
+- Semantic HTML, keyboard va drag MIME.
+
+src/features/workspace/WorkspaceShell.tsx
+- Keyboard resizer va pointer cleanup.
+
+src/features/inspector/NoteInspector.tsx
+- Desktop width resize + mobile height resize.
+- Focus/ARIA.
+
+src/features/sidebar/Ribbon.tsx
+- Files/Search/Favorites/Trash/Bookmarks/Settings ro rang.
+- Settings o cuoi ribbon.
+
+src/features/sidebar/FilesSidebarLayout.tsx
+- Tep layout chinh.
+- Search co Unfiled.
+- Folder actions, sort, drag feedback.
+
+src/features/sidebar/FlatNotesSidebar.tsx
+- Dung chung Favorites/Bookmarks neu phu hop.
+
+src/features/sidebar/SidebarViewPanel.tsx
+- Xoa Search/Bookmarks placeholder sau khi co view that.
+
+src/features/trash/*
+- Preview dung, bulk an toan, next selection va responsive.
+
+src-tauri/src/note_operations.rs
+- Permanent delete FK/order.
+- Batch Trash commands.
+- Transaction tests.
+
+src-tauri/src/lib.rs
+- Dang ky migration/command moi.
+
+src-tauri/migrations/010_*.sql
+- Sua provenance FK bang migration moi.
+
+PROJECT_CONTEXT.md
+- Cap nhat sau khi code va test da chot, dac biet unlink policy, sidebar runtime va Trash batch.
+
+package.json / vite.config.ts / test files
+- Test harness va script kiem thu.
+
+==================================================
+XIV. KIEM THU BAT BUOC
+==================================================
+
+A. Build/static
+
+1. npx.cmd tsc --noEmit
+2. npx.cmd vite build --outDir target-codex-<feature>-test --emptyOutDir
+3. cargo check --manifest-path src-tauri/Cargo.toml
+4. npm test / integration test moi.
+5. git diff --check.
+6. Thu muc build tam chi duoc don neu da resolve absolute path va chac chan nam trong workspace; khong dung lenh xoa rong.
+
+B. Autosave/data
+
+1. Go noi dung, Refresh truoc debounce: noi dung khong mat.
+2. Gia lap save fail, chuyen note: khong chuyen va loi con hien.
+3. Gia lap save fail, Ctrl+N: khong tao note moi.
+4. Dong app khi dirty: flush thanh cong moi thoat.
+
+C. Note/folder
+
+1. Tao note tu Tep: vao Unfiled.
+2. Tao note tu folder: o dung folder va giu context.
+3. Tao/cancel folder rong: khong co row rac trong DB.
+4. Di chuyen bang drag va dialog.
+5. Search thay note Unfiled va note trong nested folder.
+6. Xoa folder: branch bien mat khoi Files, co trong Trash.
+7. Restore folder: dung tree va dung tap note.
+
+D. Trash
+
+1. Trash chi co deleted items.
+2. Click note/folder mot lan mo preview.
+3. Preview khong edit va khong autosave.
+4. Restore ve folder cu; folder mat thi ve Unfiled.
+5. Permanent delete note/folder co attachment thanh cong.
+6. Bulk action khong duplicate/xoa ngoai selection.
+7. Sau action chon muc tiep theo.
+8. Confirm va action styles dung semantics.
+
+E. Attachment
+
+1. Add managed va linked file.
+2. Go khoi note nhung physical file van con.
+3. Permanent delete don dung physical managed file khi orphan.
+4. Shared attachment khong bi xoa neu note khac con dung.
+5. Chuyen note trong luc import/paste: khong chen nham note.
+6. Keo image/PDF/file tu Inspector vao dau, giua, cuoi va document rong.
+7. Khong duplicate attachment row/file.
+8. OS drop nhieu file co summary.
+9. Single-click image select, double-click popup, Escape/outside close.
+
+F. UI/accessibility
+
+1. Dark/light o 980x640, 1280x800 va man hinh rong.
+2. Inspector desktop resize ngang va bottom drawer resize doc.
+3. Keyboard Ribbon, sidebar, folder tree, tabs, modal, toolbar.
+4. Focus khong bi mat sau dong modal/Inspector.
+5. Text metadata/menu de doc va dat contrast.
+6. prefers-reduced-motion.
+
+==================================================
+XV. CHIA COMMIT DE AN TOAN
+==================================================
+
+De xuat commit doc lap:
+1. test: add safety regression harness
+2. fix: protect dirty notes during refresh and navigation
+3. fix: repair attachment unlink and permanent-delete lifecycle
+4. fix: scope asynchronous attachment operations to active note
+5. feat: implement real search and bookmark view
+6. fix: stabilize Files folder workflows
+7. fix: complete Trash batch and preview behavior
+8. a11y: improve tabs dialogs resizers and typography
+9. refactor: extract editor trash attachment and settings controllers
+10. chore: remove legacy UI and generated artifacts (chi khi duoc phep)
+
+Moi commit:
+- Khong tron don artifact voi sua tinh nang.
+- Liet ke file thay doi.
+- Chay test phu hop.
+- Co manual scenario neu lien quan Tauri drag/drop/SQLite.
+
+==================================================
+XVI. TIEU CHI HOAN THANH TOAN DU AN
+==================================================
+
+1. Khong co luong Refresh/chuyen note/tao note lam mat noi dung dirty.
+2. Note/folder/attachment soft delete, restore va permanent delete dung du lieu that.
+3. Ghi chu moi mac dinh Unfiled va khong bi tu dua vao folder.
+4. Files, Favorites, Bookmarks, Search va Trash co semantics tach biet.
+5. Search thay ca note Unfiled va nested folders.
+6. Folder tree de doc, de move, delete/restore dung va khong can click nhieu lan.
+7. Trash read-only, khong mount toolbar/autosave, co confirm va batch an toan.
+8. Attachment khong duplicate, khong chen nham note va khong bi xoa vat ly ngoai y muon.
+9. Editor gon, can giua, de viet lau; UI doc duoc o dark/light.
+10. Settings mo ngay khi click; moi section co loading/error rieng.
+11. Keyboard/focus/modal/tab/resizer dat muc su dung co ban.
+12. App.tsx khong con chua toan bo logic; UI legacy va implementation trung lap duoc loai co kiem soat.
+13. Test P0/P1, TypeScript, Vite build va Cargo check deu pass.
+14. PROJECT_CONTEXT.md phan anh dung runtime hien tai.
+15. Khong reset hoac lam mat bat ky thay doi chua commit nao trong qua trinh trien khai.

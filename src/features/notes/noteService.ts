@@ -1,0 +1,37 @@
+import { invoke } from "@tauri-apps/api/core";
+import { attachmentRepository, folderRepository, linkPreviewRepository, noteRepository } from "./noteRepository";
+import type { Attachment, Folder, LinkPreview, Note, NotePatch } from "./types";
+
+export const noteService = {
+  list: () => noteRepository.list(),
+  create: (folderId?: string | null) => noteRepository.create(folderId),
+  update: (note: Note) => noteRepository.update(note),
+  patch: (id: string, patch: NotePatch) => noteRepository.patch(id, patch),
+  moveToTrash: (id: string) => noteRepository.moveToTrash(id),
+  moveToTrashWithAttachments: (id: string) => invoke<void>("trash_note", { id }),
+  restore: (id: string) => noteRepository.restore(id),
+  restoreWithAttachments: (id: string) => invoke<void>("restore_note", { id }),
+  remove: (id: string) => noteRepository.remove(id),
+  permanentlyDelete: (id: string) => invoke<Attachment[]>("permanently_delete_note", { id }),
+  permanentlyDeleteFolderTree: (id: string) => invoke<Attachment[]>("permanently_delete_folder_tree", { id }),
+  listFolders: (): Promise<Folder[]> => folderRepository.list(),
+  createFolder: (name: string, parentId?: string | null) => folderRepository.create(name, parentId),
+  renameFolder: (id: string, name: string) => folderRepository.rename(id, name),
+  removeFolder: (id: string) => invoke<void>("trash_folder_tree", { id }),
+  restoreFolderTree: (id: string) => invoke<void>("restore_folder_tree", { id }),
+  getAttachment: (id: string) => attachmentRepository.find(id),
+  listAttachments: (noteId: string) => attachmentRepository.listForNote(noteId),
+  listAllAttachments: (noteId: string) => attachmentRepository.listAllForNote(noteId),
+  updateAttachment: (id: string, patch: Pick<Attachment, "display_mode" | "caption" | "width_mode">) => attachmentRepository.update(id, patch),
+  softDeleteAttachments: (noteId: string) => attachmentRepository.softDeleteForNote(noteId),
+  restoreAttachments: (noteId: string) => attachmentRepository.restoreForNote(noteId),
+  removeAttachments: (noteId: string) => attachmentRepository.removeForNote(noteId),
+  unlinkAttachment: (noteId: string, attachmentId: string) => attachmentRepository.unlinkFromNote(noteId, attachmentId),
+  listLinkPreviews: (noteId: string) => linkPreviewRepository.listForNote(noteId),
+  saveLinkPreview: (preview: Omit<LinkPreview, "created_at">) => linkPreviewRepository.upsert(preview),
+  removeLinkPreviews: (noteId: string) => linkPreviewRepository.removeForNote(noteId),
+  logError: (message: string) => invoke("log_client_error", { message }).catch(() => undefined),
+  createBackup: (storageRoot?: string) => invoke<string>("create_backup", { storageRoot }),
+  listBackups: (storageRoot?: string) => invoke<string[]>("list_backups", { storageRoot }),
+  restoreBackup: (name: string, storageRoot?: string) => invoke("restore_backup", { name, storageRoot }),
+};
